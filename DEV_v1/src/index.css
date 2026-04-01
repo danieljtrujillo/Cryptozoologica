@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Dancing+Script:wght@400;500;600;700&family=Special+Elite&family=Shadows+Into+Light&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Cormorant Garamond", serif;
+  --font-hand: "Dancing Script", cursive;
+  --font-typewriter: "Special Elite", system-ui;
+  --font-sketch: "Shadows Into Light", cursive;
+  --font-display: "Playfair Display", serif;
+}
+
+@layer base {
+  body {
+    @apply bg-[#e8dcc4] text-[#4a2c2a] font-serif selection:bg-[#4a2c2a] selection:text-[#e8dcc4];
+    background-image: 
+      linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px),
+      url("https://www.transparenttextures.com/patterns/old-map.png");
+    background-color: #e8dcc4;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif italic tracking-tight text-[#3d2422];
+  }
+}
+
+@layer components {
+  .journal-card {
+    @apply bg-[#f4ead5] border border-[#c5b396] shadow-xl rounded-sm p-6 relative;
+    background-image: 
+      radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      url("https://www.transparenttextures.com/patterns/paper-fibers.png");
+    box-shadow: 
+      inset 0 0 50px rgba(0,0,0,0.05),
+      0 10px 30px -10px rgba(0,0,0,0.2);
+  }
+
+  .journal-card::before {
+    content: "";
+    @apply absolute inset-0 pointer-events-none border-[16px] border-transparent opacity-40;
+    border-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='none'/%3E%3Cpath d='M0 0l40 40M40 0L0 40' stroke='%238b7355' stroke-width='1'/%3E%3C/svg%3E") 20 stretch;
+  }
+
+  .journal-card::after {
+    content: "";
+    @apply absolute inset-0 pointer-events-none opacity-10;
+    background-image: url("https://www.transparenttextures.com/patterns/stardust.png");
+  }
+
+  .ink-text {
+    @apply text-[#7a1a1a];
+    text-shadow: 0.5px 0.5px 0px rgba(0,0,0,0.1);
+  }
+
+  .handwritten {
+    @apply font-hand text-xl leading-relaxed text-[#2c3e50];
+  }
+
+  /* Document Styles */
+  .doc-typewriter {
+    @apply font-typewriter text-lg leading-relaxed text-[#333] p-8;
+    background-color: #f9f7f1;
+    background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png");
+    box-shadow: inset 0 0 100px rgba(0,0,0,0.05);
+  }
+
+  .doc-handwritten {
+    @apply font-sketch text-xl leading-loose text-[#1a3a5a] p-10;
+    background-color: #fffef0;
+    background-image: 
+      repeating-linear-gradient(transparent, transparent 31px, #e5e5e5 31px, #e5e5e5 32px),
+      url("https://www.transparenttextures.com/patterns/lined-paper.png");
+  }
+
+  .doc-newspaper {
+    @apply font-display text-base leading-snug text-[#222] p-6;
+    background-color: #e6e2d3;
+    background-image: url("https://www.transparenttextures.com/patterns/pinstriped-suit.png");
+    column-count: 1;
+    @screen md {
+      column-count: 2;
+      column-gap: 2rem;
+      column-rule: 1px solid rgba(0,0,0,0.1);
+    }
+  }
+
+  .doc-scanned {
+    @apply font-serif text-lg leading-relaxed text-[#111] p-12;
+    background-color: #fff;
+    filter: contrast(1.1) brightness(0.95) sepia(0.1);
+    background-image: 
+      linear-gradient(45deg, rgba(0,0,0,0.02) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.02) 75%, rgba(0,0,0,0.02)),
+      url("https://www.transparenttextures.com/patterns/white-diamond.png");
+  }
+
+  .doc-copy {
+    @apply font-serif text-lg leading-relaxed text-black p-8;
+    background-color: #eee;
+    filter: contrast(2) grayscale(1) brightness(0.8);
+    background-image: url("https://www.transparenttextures.com/patterns/stardust.png");
+  }
+
+  .btn-journal {
+    @apply px-4 py-2 border border-[#4a2c2a] text-[#4a2c2a] bg-[#f4ead5]/50 hover:bg-[#4a2c2a] hover:text-[#e8dcc4] transition-all duration-300 font-serif italic shadow-sm;
+  }
+}
+

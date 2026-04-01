@@ -1,8 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Shadows+Into+Light&family=Playfair+Display:ital@0;1&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-serif: "Cormorant Garamond", serif;
   --font-hand: "Dancing Script", cursive;
+  --font-typewriter: "Special Elite", monospace;
+  --font-sketch: "Shadows Into Light", cursive;
+  --font-headline: "Playfair Display", serif;
+  --color-parchment: #e8dcc4;
 }
 
 @layer base {
@@ -18,7 +23,7 @@
 
 @layer components {
   .journal-card {
-    @apply bg-[#fdfcf0] border border-[#d4c5b9] shadow-sm rounded-sm p-6 relative overflow-hidden;
+    @apply bg-[#fdfcf0] border border-[#d4c5b9] shadow-sm rounded-sm p-6 md:p-10 relative overflow-hidden;
     background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png");
   }
 
@@ -26,6 +31,11 @@
     content: "";
     @apply absolute inset-0 pointer-events-none border-[12px] border-transparent;
     border-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='none'/%3E%3Cpath d='M0 0l40 40M40 0L0 40' stroke='%23d4c5b9' stroke-width='0.5' opacity='0.3'/%3E%3C/svg%3E") 20 stretch;
+  }
+
+  .journal-card::after {
+    content: "";
+    @apply absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#5a2a27]/20 to-transparent;
   }
 
   .ink-text {
@@ -38,6 +48,42 @@
 
   .btn-journal {
     @apply px-4 py-2 border border-[#5a2a27] text-[#5a2a27] hover:bg-[#5a2a27] hover:text-[#f5f2ed] transition-all duration-300 font-serif italic;
+  }
+
+  /* Document style variants */
+  .doc-typewriter {
+    @apply bg-[#fdfcf0] border border-[#d4c5b9] p-6 md:p-10 relative;
+    font-family: "Special Elite", monospace;
+    background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png");
+    letter-spacing: 0.03em;
+  }
+
+  .doc-handwritten {
+    @apply bg-[#fef9e7] border border-[#e8dcc4] p-6 md:p-10 relative;
+    font-family: "Shadows Into Light", cursive;
+    background-image: url("https://www.transparenttextures.com/patterns/notebook.png");
+    font-size: 1.2em;
+    line-height: 2;
+  }
+
+  .doc-newspaper {
+    @apply bg-[#f5f0e1] border border-[#c8b8a2] p-6 md:p-10 relative;
+    font-family: "Playfair Display", serif;
+    background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+  }
+
+  .doc-scanned {
+    @apply bg-[#e8e0d3] border-2 border-[#b8a898] p-6 md:p-10 relative shadow-inner;
+    font-family: "Cormorant Garamond", serif;
+    background-image: url("https://www.transparenttextures.com/patterns/old-map.png");
+    filter: contrast(1.05) brightness(0.98);
+  }
+
+  .doc-copy {
+    @apply bg-white border border-gray-300 p-6 md:p-10 relative;
+    font-family: "Courier New", monospace;
+    background-image: url("https://www.transparenttextures.com/patterns/white-diamond.png");
+    letter-spacing: 0.05em;
   }
 }
 

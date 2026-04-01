@@ -24,21 +24,20 @@
       "required": ["userId", "cryptidName", "description", "timestamp"]
     },
     "SavedEntry": {
-      "title": "SavedEntry",
-      "description": "A journal entry saved by the user from research.",
+      "title": "Saved Entry",
+      "description": "A saved journal entry from the archives.",
       "type": "object",
       "properties": {
         "userId": { "type": "string" },
         "cryptidName": { "type": "string" },
         "content": { "type": "string" },
-        "imageUrl": { "type": "string", "format": "uri" },
         "timestamp": { "type": "string", "format": "date-time" }
       },
       "required": ["userId", "cryptidName", "content", "timestamp"]
     },
     "SavedLocation": {
-      "title": "SavedLocation",
-      "description": "A location saved from the expedition map.",
+      "title": "Saved Location",
+      "description": "A saved location of interest.",
       "type": "object",
       "properties": {
         "userId": { "type": "string" },
@@ -62,7 +61,7 @@
     },
     "/saved_locations": {
       "schema": "SavedLocation",
-      "description": "Collection of saved expedition locations."
+      "description": "Collection of saved locations."
     }
   }
 }

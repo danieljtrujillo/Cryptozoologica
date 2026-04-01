@@ -1,110 +1,159 @@
-import { GoogleGenAI, Type, Modality, ThinkingLevel } from "@google/genai";
+import { GoogleGenAI, Type, Modality } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+declare global {
+  interface Window {
+    aistudio?: {
+      openSelectKey: () => void;
+    };
+  }
+}
 
-export const searchCryptid = async (query: string) => {
-  const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
-    contents: `Provide a detailed scientific journal entry for the cryptid: ${query}. Include its appearance, habitat, behavior, and any known sightings.`,
-    config: {
-      tools: [{ googleSearch: {} }],
-      systemInstruction: "You are a seasoned cryptozoologist writing a scientific expedition journal. Use a formal yet adventurous tone. Focus on biological and ecological aspects.",
-    },
-  });
-  return response.text;
+const getAI = () => {
+  const masterKey = process.env.RESEARCH;
+  const apiKey = masterKey || process.env.GEMINI_API_KEY;
+  return new GoogleGenAI({ apiKey });
+};
+
+const handleApiError = (err: any) => {
+  const errorMsg = err?.message || "";
+  if (errorMsg.includes("Requested entity was not found") || errorMsg.includes("PERMISSION_DENIED")) {
+    if (window.aistudio) {
+      window.aistudio.openSelectKey();
+    }
+  }
+  throw err;
+};
+
+export const searchCryptid = async (query: string): Promise<{ text: string; imageUrl: string | null }> => {
+  try {
+    const ai = getAI();
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: `Provide a detailed scientific journal entry for the cryptid: ${query}. Include its appearance, habitat, behavior, and any known sightings. Bold all proper names of cryptids that appear in your entry.`,
+      config: {
+        tools: [{ googleSearch: {} }],
+        systemInstruction: "You are a seasoned cryptozoologist writing a scientific expedition journal. Use a formal yet adventurous tone. Focus on biological and ecological aspects. Bold all cryptid names (e.g. **Chupacabra**, **Mothman**).",
+      },
+    });
+
+    let imageUrl: string | null = null;
+    try {
+      const sketchAi = getAI();
+      const sketchResponse = await sketchAi.models.generateContent({
+        model: 'gemini-3.1-flash-image-preview',
+        contents: `A detailed scientific field sketch of the cryptid "${query}". Hand-drawn with reddish-brown ink on aged, yellowish parchment paper. Include anatomical annotations.`,
+        config: {
+          responseModalities: [Modality.TEXT, Modality.IMAGE],
+        },
+      });
+      for (const part of sketchResponse.candidates?.[0]?.content?.parts || []) {
+        if (part.inlineData) {
+          imageUrl = `data:image/png;base64,${part.inlineData.data}`;
+          break;
+        }
+      }
+    } catch (sketchErr) {
+      console.warn("Sketch generation failed, proceeding without image:", sketchErr);
+    }
+
+    return { text: response.text || "", imageUrl };
+  } catch (err) {
+    handleApiError(err);
+    return { text: "", imageUrl: null };
+  }
 };
 
 export const searchNearbyCryptids = async (lat: number, lng: number) => {
-  const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
-    contents: `What cryptids are reported near these coordinates: ${lat}, ${lng}? Focus on the Florida and Puerto Rico area, specifically near Arecibo if relevant.`,
-    config: {
-      tools: [{ googleMaps: {} }],
-      toolConfig: {
-        retrievalConfig: {
-          latLng: { latitude: lat, longitude: lng }
-        }
-      }
-    },
-  });
-  
-  const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
-  return {
-    text: response.text,
-    sources: groundingChunks?.map(chunk => chunk.maps?.uri).filter(Boolean) || []
-  };
+  try {
+    const ai = getAI();
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: `What cryptids, folklore creatures, or unexplained phenomena are reported near these coordinates: ${lat}, ${lng}? Bold all cryptid names.`,
+      config: {
+        tools: [{ googleSearch: {} }],
+        systemInstruction: "You are a cryptozoologist. Provide information about local cryptid sightings and folklore near these coordinates. Bold all cryptid names (e.g. **Chupacabra**).",
+      },
+    });
+    
+    const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
+    return {
+      text: response.text || "",
+      sources: groundingChunks?.map((chunk: any) => chunk.web?.uri || chunk.maps?.uri).filter(Boolean) || []
+    };
+  } catch (err) {
+    handleApiError(err);
+    return { text: "", sources: [] };
+  }
 };
 
-export const generateCryptidSketch = async (description: string, size: "1K" | "2K" | "4K" = "1K") => {
-  const response = await ai.models.generateContent({
-    model: 'gemini-3-pro-image-preview',
-    contents: {
-      parts: [
-        {
-          text: `A detailed scientific field sketch of a cryptid: ${description}. The style should be hand-drawn with reddish-brown ink on aged, yellowish parchment paper. Include anatomical annotations and a scale bar.`,
-        },
-      ],
-    },
-    config: {
-      imageConfig: {
-        aspectRatio: "3:4",
-        imageSize: size
+export const generateCryptidSketch = async (description: string) => {
+  try {
+    const ai = getAI();
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.1-flash-image-preview',
+      contents: `A detailed scientific field sketch of a cryptid: ${description}. The style should be hand-drawn with reddish-brown ink on aged, yellowish parchment paper. Include anatomical annotations and a scale bar.`,
+      config: {
+        responseModalities: [Modality.TEXT, Modality.IMAGE],
       },
-    },
-  });
+    });
 
-  for (const part of response.candidates[0].content.parts) {
-    if (part.inlineData) {
-      return `data:image/png;base64,${part.inlineData.data}`;
+    for (const part of response.candidates?.[0]?.content?.parts || []) {
+      if (part.inlineData) {
+        return `data:image/png;base64,${part.inlineData.data}`;
+      }
     }
+    return null;
+  } catch (err) {
+    handleApiError(err);
+    return null;
   }
-  return null;
 };
 
 export const identifyCryptid = async (base64Image: string) => {
-  const response = await ai.models.generateContent({
-    model: "gemini-3.1-pro-preview",
-    contents: {
-      parts: [
-        { inlineData: { data: base64Image.split(',')[1], mimeType: "image/jpeg" } },
-        { text: "Identify the cryptid in this image. If it's a new one, suggest a scientific name and describe its characteristics." }
-      ]
-    },
-    config: {
-      thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH }
-    }
-  });
-  return response.text;
+  try {
+    const ai = getAI();
+    const response = await ai.models.generateContent({
+      model: "gemini-3.1-pro-preview",
+      contents: {
+        parts: [
+          { inlineData: { data: base64Image.split(',')[1], mimeType: "image/jpeg" } },
+          { text: "Identify the cryptid in this image. If it's a new one, suggest a scientific name and describe its characteristics." }
+        ]
+      },
+    });
+    return response.text || "";
+  } catch (err) {
+    handleApiError(err);
+    return "";
+  }
 };
 
 export const speakJournalEntry = async (text: string) => {
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash-preview-tts",
-    contents: [{ parts: [{ text: `Read this journal entry with a seasoned, slightly weathered explorer's voice: ${text}` }] }],
-    config: {
-      responseModalities: [Modality.AUDIO],
-      speechConfig: {
-        voiceConfig: {
-          prebuiltVoiceConfig: { voiceName: 'Fenrir' },
+  try {
+    const ai = getAI();
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash-preview-tts",
+      contents: [{ parts: [{ text: `Read this journal entry with a seasoned, slightly weathered explorer's voice: ${text}` }] }],
+      config: {
+        responseModalities: [Modality.AUDIO],
+        speechConfig: {
+          voiceConfig: {
+            prebuiltVoiceConfig: { voiceName: 'Fenrir' },
+          },
         },
       },
-    },
-  });
+    });
 
-  const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-  if (base64Audio) {
-    const binary = atob(base64Audio);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i);
-    }
-    const blob = new Blob([bytes], { type: 'audio/pcm;rate=24000' });
-    return URL.createObjectURL(blob);
+    const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+    return base64Audio || null;
+  } catch (err) {
+    handleApiError(err);
+    return null;
   }
-  return null;
 };
 
 export const createCryptidChat = () => {
+  const ai = getAI();
   return ai.chats.create({
     model: "gemini-3.1-pro-preview",
     config: {
