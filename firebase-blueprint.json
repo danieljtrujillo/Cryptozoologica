@@ -1,0 +1,33 @@
+{
+  "entities": {
+    "Observation": {
+      "title": "Observation",
+      "description": "A user's field observation of a cryptid.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "The UID of the user who made the observation." },
+        "cryptidName": { "type": "string", "description": "The name of the cryptid observed." },
+        "description": { "type": "string", "description": "Detailed description of the sighting." },
+        "location": {
+          "type": "object",
+          "properties": {
+            "lat": { "type": "number" },
+            "lng": { "type": "number" },
+            "address": { "type": "string" }
+          },
+          "required": ["lat", "lng"]
+        },
+        "timestamp": { "type": "string", "format": "date-time", "description": "When the observation occurred." },
+        "imageUrl": { "type": "string", "format": "uri" },
+        "videoUrl": { "type": "string", "format": "uri" }
+      },
+      "required": ["userId", "cryptidName", "description", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/observations": {
+      "schema": "Observation",
+      "description": "Collection of all field observations."
+    }
+  }
+}

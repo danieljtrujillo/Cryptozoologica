@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Cormorant Garamond", serif;
+  --font-hand: "Dancing Script", cursive;
+}
+
+@layer base {
+  body {
+    @apply bg-[#f5f2ed] text-[#5a2a27] font-serif selection:bg-[#5a2a27] selection:text-[#f5f2ed];
+    background-image: url("https://www.transparenttextures.com/patterns/parchment.png");
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif italic tracking-tight;
+  }
+}
+
+@layer components {
+  .journal-card {
+    @apply bg-[#fdfcf0] border border-[#d4c5b9] shadow-sm rounded-sm p-6 relative overflow-hidden;
+    background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png");
+  }
+
+  .journal-card::before {
+    content: "";
+    @apply absolute inset-0 pointer-events-none border-[12px] border-transparent;
+    border-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='none'/%3E%3Cpath d='M0 0l40 40M40 0L0 40' stroke='%23d4c5b9' stroke-width='0.5' opacity='0.3'/%3E%3C/svg%3E") 20 stretch;
+  }
+
+  .ink-text {
+    @apply text-[#8b0000];
+  }
+
+  .handwritten {
+    @apply font-hand text-xl leading-relaxed;
+  }
+
+  .btn-journal {
+    @apply px-4 py-2 border border-[#5a2a27] text-[#5a2a27] hover:bg-[#5a2a27] hover:text-[#f5f2ed] transition-all duration-300 font-serif italic;
+  }
+}
+

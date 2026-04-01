@@ -1,0 +1,5 @@
+{
+  "name": "The Cryptid Journal",
+  "description": "A scientific expedition journal for cryptozoologists. Explore, identify, and converse with the world's most elusive creatures.",
+  "requestFramePermissions": ["camera", "microphone", "geolocation"]
+}
