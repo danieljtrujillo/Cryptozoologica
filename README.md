@@ -1,20 +1,47 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Cryptozoologica — The Cryptid Journal
 
-# Run and deploy your AI Studio app
+A scientific expedition journal for cryptozoologists. Research cryptids with AI-powered field notes, explore sighting locations on an interactive map, generate scientific sketches, and log your own observations.
 
-This contains everything you need to run your app locally.
+## Features
 
-View your app in AI Studio: https://ai.studio/apps/f39635f3-2509-408f-850c-d2bbb72501e4
+- **Field Journal** — Search any cryptid and get a detailed scientific journal entry powered by Gemini AI with Google Search grounding
+- **Expedition Map** — Discover cryptids reported near any coordinates, backed by Google Maps grounding
+- **Research Lab** — Generate hand-drawn scientific field sketches of cryptids using Gemini image generation
+- **My Observations** — Log and manage personal field sightings stored in Firebase Firestore
+- **Cryptid Live** — Real-time cryptid research and conversation
+
+## Tech Stack
+
+- **Frontend:** React 19, TypeScript, Tailwind CSS 4, Vite 6
+- **AI:** Gemini API (`@google/genai`) — search, maps grounding, and image generation
+- **Backend:** Firebase Auth (Google sign-in) + Firestore
+- **Deployment:** Cloudflare Pages
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
-
+**Prerequisites:** Node.js 18+
 
 1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+   ```
+   npm install
+   ```
+2. Create a `.env` file with your Gemini API key:
+   ```
+   GEMINI_API_KEY="your-api-key-here"
+   ```
+   Get one at [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
+3. Start the dev server:
+   ```
+   npm run dev
+   ```
+4. Open **http://localhost:3000**
+
+## Deploy
+
+This repo is configured for **Cloudflare Pages** with git-based deployments.
+
+- **Build command:** `npm run build`
+- **Output directory:** `dist`
+- **Environment variable:** Set `GEMINI_API_KEY` in the Cloudflare Pages dashboard
+
+Every push to `main` triggers an automatic production deployment.
