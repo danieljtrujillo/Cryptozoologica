@@ -1,16 +1,9 @@
 import { GoogleGenAI, Type, Modality } from "@google/genai";
-
-declare global {
-  interface Window {
-    aistudio?: {
-      openSelectKey: () => void;
-    };
-  }
-}
+import { withStyle } from '../constants/writing-style';
 
 const getAI = () => {
-  const masterKey = process.env.RESEARCH;
-  const apiKey = masterKey || process.env.GEMINI_API_KEY;
+  const apiKey = process.env.RESEARCH || process.env.GEMINI_API_KEY;
+  if (!apiKey) console.warn('No API key found. Set RESEARCH in .env');
   return new GoogleGenAI({ apiKey });
 };
 
@@ -32,7 +25,7 @@ export const searchCryptid = async (query: string): Promise<{ text: string; imag
       contents: `Provide a detailed scientific journal entry for the cryptid: ${query}. Include its appearance, habitat, behavior, and any known sightings. Bold all proper names of cryptids that appear in your entry.`,
       config: {
         tools: [{ googleSearch: {} }],
-        systemInstruction: "You are a seasoned cryptozoologist writing a scientific expedition journal. Use a formal yet adventurous tone. Focus on biological and ecological aspects. Bold all cryptid names (e.g. **Chupacabra**, **Mothman**).",
+        systemInstruction: withStyle("You are a field cryptozoologist writing expedition notes. Write as if logging observations after a long day in the field. Focus on what the creature looks like, where it lives, how it behaves, and what witnesses reported. Use specific locations and dates when available. Bold all cryptid names (e.g. **Chupacabra**, **Mothman**)."),
       },
     });
 
@@ -71,7 +64,7 @@ export const searchNearbyCryptids = async (lat: number, lng: number) => {
       contents: `What cryptids, folklore creatures, or unexplained phenomena are reported near these coordinates: ${lat}, ${lng}? Bold all cryptid names.`,
       config: {
         tools: [{ googleSearch: {} }],
-        systemInstruction: "You are a cryptozoologist. Provide information about local cryptid sightings and folklore near these coordinates. Bold all cryptid names (e.g. **Chupacabra**).",
+        systemInstruction: withStyle("You are a field cryptozoologist reporting on local sightings. For each creature, include the location name, any witness accounts, and what makes this area significant for sightings. Bold all cryptid names (e.g. **Chupacabra**)."),
       },
     });
     
@@ -120,6 +113,9 @@ export const identifyCryptid = async (base64Image: string) => {
           { text: "Identify the cryptid in this image. If it's a new one, suggest a scientific name and describe its characteristics." }
         ]
       },
+      config: {
+        systemInstruction: withStyle("You are a field biologist examining specimen evidence. Describe what you see in concrete terms: size estimates, coloring, anatomical features, possible species matches. If you can't identify it, say so and explain what's unusual."),
+      },
     });
     return response.text || "";
   } catch (err) {
@@ -157,7 +153,7 @@ export const createCryptidChat = () => {
   return ai.chats.create({
     model: "gemini-3.1-pro-preview",
     config: {
-      systemInstruction: "You are Dr. Alistair Thorne, a world-renowned cryptozoologist with 40 years of field experience. You are currently in Puerto Rico investigating sightings near the Arecibo Observatory. You speak English and Spanish (with a warm Puerto Rican accent when appropriate). You are helpful, scientific, and deeply passionate about the unknown. You can help identify creatures, suggest how to attract them, and share lore from your travels.",
+      systemInstruction: withStyle("You are Dr. Alistair Thorne, a cryptozoologist with 40 years of field experience. You are in Puerto Rico investigating sightings near the collapsed Arecibo Observatory. You speak English and Spanish. You have strong opinions about which sightings are credible and which are nonsense. You cite specific expeditions, dates, and locations from your career. When you don't know something, you say so. You're warm but direct, not a tour guide."),
     },
   });
 };

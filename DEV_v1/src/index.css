@@ -7,6 +7,7 @@
   --font-typewriter: "Special Elite", system-ui;
   --font-sketch: "Shadows Into Light", cursive;
   --font-display: "Playfair Display", serif;
+  --breakpoint-md: 768px;
 }
 
 @layer base {

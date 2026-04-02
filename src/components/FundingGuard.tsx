@@ -5,7 +5,8 @@ import { Loader2, KeyRound, AlertTriangle } from 'lucide-react';
 declare global {
   interface Window {
     aistudio?: {
-      openSelectKey: () => void;
+      hasSelectedApiKey: () => Promise<boolean>;
+      openSelectKey: () => Promise<void>;
     };
   }
 }
@@ -24,8 +25,7 @@ export default function FundingGuard({ children }: FundingGuardProps) {
 
   const checkApiKey = async () => {
     setChecking(true);
-    const masterKey = process.env.RESEARCH;
-    const apiKey = masterKey || process.env.GEMINI_API_KEY;
+    const apiKey = process.env.RESEARCH || process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
       // Check if running in AI Studio environment

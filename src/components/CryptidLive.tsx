@@ -3,11 +3,10 @@ import { Mic, MicOff, Loader2, Volume2, VolumeX, ImageIcon, Sparkles } from 'luc
 import { GoogleGenAI, Modality, type LiveServerMessage } from '@google/genai';
 import { cn } from '../lib/utils';
 import { generateCryptidSketch } from '../services/gemini';
+import { withStyle, withStyleES } from '../constants/writing-style';
 
 function getApiKey(): string {
-  const research = (typeof process !== 'undefined' && process.env?.RESEARCH) || '';
-  const gemini = import.meta.env.VITE_GEMINI_API_KEY || '';
-  return research || gemini;
+  return process.env.RESEARCH || process.env.GEMINI_API_KEY || '';
 }
 
 export default function CryptidLive() {
@@ -29,14 +28,14 @@ export default function CryptidLive() {
   const isPlayingRef = useRef(false);
 
   const systemInstructions: Record<string, string> = {
-    en: "You are a cryptozoology field expert on a live radio channel. Speak dramatically and knowledgeably about cryptids, monsters, and unexplained creatures. Keep responses concise for voice. Reference folklore, witness accounts, and your own 'field experience'.",
-    es: "Eres un experto en criptozoología en un canal de radio en vivo. Habla dramáticamente y con conocimiento sobre críptidos, monstruos y criaturas inexplicables. Mantén las respuestas concisas para voz. Referencia folclore, testimonios de testigos y tu propia 'experiencia de campo'. Responde siempre en español."
+    en: withStyle("You are a cryptozoology field researcher on a live radio channel. You've spent decades in the field. Keep responses short for voice. Cite specific locations, dates, and witness names when possible. If a caller asks about something you think is bogus, say so and explain why."),
+    es: withStyleES("Eres un investigador de campo en criptozoología en un canal de radio en vivo. Llevas décadas en el campo. Mantén las respuestas cortas para voz. Cita ubicaciones, fechas y nombres de testigos cuando sea posible. Si alguien pregunta sobre algo que crees falso, dilo y explica por qué. Responde siempre en español.")
   };
 
   const connect = useCallback(async () => {
     const apiKey = getApiKey();
     if (!apiKey) {
-      const msg = 'No API key found. Please set VITE_GEMINI_API_KEY.';
+      const msg = 'No API key found. Please set RESEARCH in .env.';
       setError(msg);
       if ((window as any).aistudio?.setError) (window as any).aistudio.setError(msg);
       return;

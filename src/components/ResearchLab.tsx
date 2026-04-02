@@ -194,7 +194,7 @@ export default function ResearchLab() {
               <textarea
                 value={sketchPrompt}
                 onChange={(e) => setSketchPrompt(e.target.value)}
-                placeholder="Describe the creature in detail (e.g. A large bipedal lizard with glowing red eyes and leathery wings)..."
+                placeholder="What did you see? Describe it: size, color, number of limbs, where you spotted it, time of day, anything unusual..."
                 className="w-full bg-transparent border-b border-[#5a2a27] p-2 focus:outline-none font-serif italic text-lg min-h-[100px] resize-none"
               />
             </div>
