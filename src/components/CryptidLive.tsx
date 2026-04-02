@@ -255,7 +255,7 @@ export default function CryptidLive() {
                   <span>Sketch</span>
                 </button>
               </div>
-              <p className="font-serif italic leading-relaxed whitespace-pre-wrap break-words">{response}</p>
+              <p className="font-serif italic leading-relaxed whitespace-pre-wrap wrap-break-word">{response}</p>
               {sketchUrl && (
                 <div className="border-4 border-[#5a2a27]/10 p-2 bg-white/30 max-w-sm mx-auto">
                   <img src={sketchUrl} alt="Cryptid sketch" className="w-full grayscale contrast-125 sepia-[.3]" />
