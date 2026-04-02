@@ -78,7 +78,7 @@
     background-color: #e6e2d3;
     background-image: url("https://www.transparenttextures.com/patterns/pinstriped-suit.png");
     column-count: 1;
-    @screen md {
+    @media (width >= theme(--breakpoint-md)) {
       column-count: 2;
       column-gap: 2rem;
       column-rule: 1px solid rgba(0,0,0,0.1);
