@@ -13,7 +13,7 @@
 @layer base {
   body {
     @apply bg-[#f5f2ed] text-[#5a2a27] font-serif selection:bg-[#5a2a27] selection:text-[#f5f2ed];
-    background-image: url("https://www.transparenttextures.com/patterns/parchment.png");
+    background-image: url("/textures/parchment.png");
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -24,7 +24,7 @@
 @layer components {
   .journal-card {
     @apply bg-[#fdfcf0] border border-[#d4c5b9] shadow-sm rounded-sm p-6 md:p-10 relative overflow-hidden;
-    background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png");
+    background-image: url("/textures/paper-fibers.png");
   }
 
   .journal-card::before {
@@ -54,14 +54,14 @@
   .doc-typewriter {
     @apply bg-[#fdfcf0] border border-[#d4c5b9] p-6 md:p-10 relative;
     font-family: "Special Elite", monospace;
-    background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png");
+    background-image: url("/textures/paper-fibers.png");
     letter-spacing: 0.03em;
   }
 
   .doc-handwritten {
     @apply bg-[#fef9e7] border border-parchment p-6 md:p-10 relative;
     font-family: "Shadows Into Light", cursive;
-    background-image: url("https://www.transparenttextures.com/patterns/notebook.png");
+    background-image: url("/textures/notebook.png");
     font-size: 1.2em;
     line-height: 2;
   }
@@ -69,20 +69,20 @@
   .doc-newspaper {
     @apply bg-[#f5f0e1] border border-[#c8b8a2] p-6 md:p-10 relative;
     font-family: "Playfair Display", serif;
-    background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+    background-image: url("/textures/cream-paper.png");
   }
 
   .doc-scanned {
     @apply bg-[#e8e0d3] border-2 border-[#b8a898] p-6 md:p-10 relative shadow-inner;
     font-family: "Cormorant Garamond", serif;
-    background-image: url("https://www.transparenttextures.com/patterns/old-map.png");
+    background-image: url("/textures/old-map.png");
     filter: contrast(1.05) brightness(0.98);
   }
 
   .doc-copy {
     @apply bg-white border border-gray-300 p-6 md:p-10 relative;
     font-family: "Courier New", monospace;
-    background-image: url("https://www.transparenttextures.com/patterns/white-diamond.png");
+    background-image: url("/textures/white-diamond.png");
     letter-spacing: 0.05em;
   }
 }

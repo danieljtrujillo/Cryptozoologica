@@ -16,7 +16,7 @@
     background-image: 
       linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px),
-      url("https://www.transparenttextures.com/patterns/old-map.png");
+      url("/textures/old-map.png");
     background-color: #e8dcc4;
   }
 
@@ -30,7 +30,7 @@
     @apply bg-[#f4ead5] border border-[#c5b396] shadow-xl rounded-sm p-6 relative;
     background-image: 
       radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 100%),
-      url("https://www.transparenttextures.com/patterns/paper-fibers.png");
+      url("/textures/paper-fibers.png");
     box-shadow: 
       inset 0 0 50px rgba(0,0,0,0.05),
       0 10px 30px -10px rgba(0,0,0,0.2);
@@ -45,7 +45,7 @@
   .journal-card::after {
     content: "";
     @apply absolute inset-0 pointer-events-none opacity-10;
-    background-image: url("https://www.transparenttextures.com/patterns/stardust.png");
+    background-image: url("/textures/stardust.png");
   }
 
   .ink-text {
@@ -61,7 +61,7 @@
   .doc-typewriter {
     @apply font-typewriter text-lg leading-relaxed text-[#333] p-8;
     background-color: #f9f7f1;
-    background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png");
+    background-image: url("/textures/paper-fibers.png");
     box-shadow: inset 0 0 100px rgba(0,0,0,0.05);
   }
 
@@ -70,13 +70,13 @@
     background-color: #fffef0;
     background-image: 
       repeating-linear-gradient(transparent, transparent 31px, #e5e5e5 31px, #e5e5e5 32px),
-      url("https://www.transparenttextures.com/patterns/lined-paper.png");
+      url("/textures/lined-paper.png");
   }
 
   .doc-newspaper {
     @apply font-display text-base leading-snug text-[#222] p-6;
     background-color: #e6e2d3;
-    background-image: url("https://www.transparenttextures.com/patterns/pinstriped-suit.png");
+    background-image: url("/textures/pinstriped-suit.png");
     column-count: 1;
     @media (width >= theme(--breakpoint-md)) {
       column-count: 2;
@@ -91,14 +91,14 @@
     filter: contrast(1.1) brightness(0.95) sepia(0.1);
     background-image: 
       linear-gradient(45deg, rgba(0,0,0,0.02) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.02) 75%, rgba(0,0,0,0.02)),
-      url("https://www.transparenttextures.com/patterns/white-diamond.png");
+      url("/textures/white-diamond.png");
   }
 
   .doc-copy {
     @apply font-serif text-lg leading-relaxed text-black p-8;
     background-color: #eee;
     filter: contrast(2) grayscale(1) brightness(0.8);
-    background-image: url("https://www.transparenttextures.com/patterns/stardust.png");
+    background-image: url("/textures/stardust.png");
   }
 
   .btn-journal {
