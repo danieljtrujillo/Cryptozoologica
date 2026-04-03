@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Plus, Trash2, MapPin, Calendar, Loader2, ClipboardList, Book, Bookmark } from 'lucide-react';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { useCollectionData } from 'react-firebase-hooks/firestore';
-import { collection, addDoc, deleteDoc, doc, query, where, orderBy, serverTimestamp } from 'firebase/firestore';
-import { auth, db } from '../lib/firebase';
+import { useAuth } from '../lib/auth';
+import { apiGet, apiPost, apiDelete } from '../lib/api';
 import { cn } from '../lib/utils';
 import ReactMarkdown from 'react-markdown';
 
 export default function MyObservations() {
-  const [user] = useAuthState(auth);
+  const { user } = useAuth();
   const [activeSubTab, setActiveSubTab] = useState<'sightings' | 'entries' | 'locations'>('sightings');
   const [isAdding, setIsAdding] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -18,31 +16,50 @@ export default function MyObservations() {
     locationName: '',
   });
 
-  const observationsRef = collection(db, 'observations');
-  const entriesRef = collection(db, 'saved_entries');
-  const locationsRef = collection(db, 'saved_locations');
+  const [sightings, setSightings] = useState<any[]>([]);
+  const [entries, setEntries] = useState<any[]>([]);
+  const [locations, setLocations] = useState<any[]>([]);
+  const [sightingsLoading, setSightingsLoading] = useState(true);
+  const [entriesLoading, setEntriesLoading] = useState(true);
+  const [locationsLoading, setLocationsLoading] = useState(true);
 
-  const sightingsQuery = user ? query(observationsRef, where('userId', '==', user.uid), orderBy('timestamp', 'desc')) : null;
-  const entriesQuery = user ? query(entriesRef, where('userId', '==', user.uid), orderBy('timestamp', 'desc')) : null;
-  const locationsQuery = user ? query(locationsRef, where('userId', '==', user.uid), orderBy('timestamp', 'desc')) : null;
+  const fetchSightings = useCallback(() => {
+    if (!user) return;
+    setSightingsLoading(true);
+    apiGet<any[]>('/api/observations').then(setSightings).catch(console.error).finally(() => setSightingsLoading(false));
+  }, [user]);
 
-  const [sightings, sightingsLoading] = useCollectionData(sightingsQuery);
-  const [entries, entriesLoading] = useCollectionData(entriesQuery);
-  const [locations, locationsLoading] = useCollectionData(locationsQuery);
+  const fetchEntries = useCallback(() => {
+    if (!user) return;
+    setEntriesLoading(true);
+    apiGet<any[]>('/api/saved-entries').then(setEntries).catch(console.error).finally(() => setEntriesLoading(false));
+  }, [user]);
+
+  const fetchLocations = useCallback(() => {
+    if (!user) return;
+    setLocationsLoading(true);
+    apiGet<any[]>('/api/saved-locations').then(setLocations).catch(console.error).finally(() => setLocationsLoading(false));
+  }, [user]);
+
+  useEffect(() => {
+    fetchSightings();
+    fetchEntries();
+    fetchLocations();
+  }, [fetchSightings, fetchEntries, fetchLocations]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || loading) return;
     setLoading(true);
     try {
-      await addDoc(observationsRef, {
-        ...formData,
-        userId: user.uid,
-        timestamp: serverTimestamp(),
-        location: { lat: 0, lng: 0, address: formData.locationName }
+      await apiPost('/api/observations', {
+        cryptidName: formData.cryptidName,
+        description: formData.description,
+        locationName: formData.locationName,
       });
       setFormData({ cryptidName: '', description: '', locationName: '' });
       setIsAdding(false);
+      fetchSightings();
     } catch (err) {
       console.error(err);
     } finally {
@@ -53,7 +70,15 @@ export default function MyObservations() {
   const handleDelete = async (collectionName: string, id: string) => {
     if (!window.confirm("Are you sure you want to strike this from the record?")) return;
     try {
-      await deleteDoc(doc(db, collectionName, id));
+      const pathMap: Record<string, string> = {
+        observations: '/api/observations',
+        saved_entries: '/api/saved-entries',
+        saved_locations: '/api/saved-locations',
+      };
+      await apiDelete(`${pathMap[collectionName]}/${id}`);
+      if (collectionName === 'observations') fetchSightings();
+      else if (collectionName === 'saved_entries') fetchEntries();
+      else fetchLocations();
     } catch (err) {
       console.error(err);
     }
@@ -159,10 +184,10 @@ export default function MyObservations() {
             ) : (
               sightings?.map((obs: any, i) => (
                 <div key={i} className="doc-handwritten group shadow-lg relative overflow-hidden -rotate-1 mb-8">
-                  <div className="absolute top-2 left-4 text-[9px] uppercase tracking-widest opacity-30 font-sans">Observation Log - {obs.timestamp?.toDate().toLocaleDateString()}</div>
+                  <div className="absolute top-2 left-4 text-[9px] uppercase tracking-widest opacity-30 font-sans">Observation Log - {new Date(obs.created_at).toLocaleDateString()}</div>
                   <div className="flex justify-between items-start mb-4 mt-4">
                     <div className="space-y-1">
-                      <h3 className="text-2xl ink-text">{obs.cryptidName}</h3>
+                      <h3 className="text-2xl ink-text">{obs.cryptid_name}</h3>
                     </div>
                     <button onClick={() => handleDelete('observations', obs.id)} className="p-2 text-[#8b0000] opacity-0 group-hover:opacity-100 transition-opacity">
                       <Trash2 size={18} />
@@ -170,7 +195,7 @@ export default function MyObservations() {
                   </div>
                   <p className="font-sketch text-xl leading-relaxed mb-6 italic break-words">"{obs.description}"</p>
                   <div className="flex flex-wrap gap-4 text-xs italic opacity-60">
-                    <div className="flex items-center space-x-1"><MapPin size={14} /><span>{obs.locationName}</span></div>
+                    <div className="flex items-center space-x-1"><MapPin size={14} /><span>{obs.location_name}</span></div>
                   </div>
                 </div>
               ))
@@ -190,10 +215,10 @@ export default function MyObservations() {
           ) : (
             entries?.map((entry: any, i) => (
               <div key={i} className="doc-scanned group overflow-visible shadow-xl mb-8">
-                <div className="absolute top-2 left-4 text-[9px] uppercase tracking-widest opacity-30 font-sans">Field Note - {entry.timestamp?.toDate().toLocaleDateString()}</div>
+                <div className="absolute top-2 left-4 text-[9px] uppercase tracking-widest opacity-30 font-sans">Field Note - {new Date(entry.created_at).toLocaleDateString()}</div>
                 <div className="flex justify-between items-start mb-6 mt-4">
                   <div className="space-y-1">
-                    <h3 className="text-3xl md:text-4xl ink-text border-b border-[#5a2a27]/20 pb-1">{entry.cryptidName}</h3>
+                    <h3 className="text-3xl md:text-4xl ink-text border-b border-[#5a2a27]/20 pb-1">{entry.cryptid_name}</h3>
                   </div>
                   <button onClick={() => handleDelete('saved_entries', entry.id)} className="p-2 text-[#8b0000] opacity-0 group-hover:opacity-100 transition-opacity">
                     <Trash2 size={18} />
@@ -201,15 +226,15 @@ export default function MyObservations() {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                  <div className={cn("prose prose-sepia max-w-none font-serif text-lg leading-relaxed break-words overflow-hidden", entry.imageUrl ? "md:col-span-3" : "md:col-span-4")}>
+                  <div className={cn("prose prose-sepia max-w-none font-serif text-lg leading-relaxed break-words overflow-hidden", entry.image_url ? "md:col-span-3" : "md:col-span-4")}>
                     <ReactMarkdown>{entry.content}</ReactMarkdown>
                   </div>
-                  {entry.imageUrl && (
+                  {entry.image_url && (
                     <div className="md:col-span-1">
                       <div className="border-4 border-[#5a2a27]/10 p-2 bg-white/30 rotate-2 shadow-lg">
                         <img 
-                          src={entry.imageUrl} 
-                          alt={entry.cryptidName} 
+                          src={entry.image_url} 
+                          alt={entry.cryptid_name} 
                           className="w-full h-auto grayscale contrast-125 sepia-[.3]"
                           referrerPolicy="no-referrer"
                         />

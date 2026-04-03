@@ -1,8 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Book, Map, FlaskConical, ClipboardList, LogOut, User, Archive } from 'lucide-react';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, signIn, signOut } from '../lib/firebase';
+import { useAuth } from '../lib/auth';
 import { cn } from '../lib/utils';
 
 interface JournalLayoutProps {
@@ -13,7 +12,7 @@ interface JournalLayoutProps {
 }
 
 export default function JournalLayout({ children, activeTab, setActiveTab, onOpenArchive }: JournalLayoutProps) {
-  const [user] = useAuthState(auth);
+  const { user, signOut } = useAuth();
 
   const tabs = [
     { id: 'journal', label: 'Journal', icon: Book },
@@ -66,21 +65,18 @@ export default function JournalLayout({ children, activeTab, setActiveTab, onOpe
           {user ? (
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <img src={user.photoURL || ''} alt="" className="w-8 h-8 rounded-full border border-[#5a2a27]" />
-                <span className="text-xs font-serif italic truncate max-w-[100px]">{user.displayName}</span>
+                <div className="w-8 h-8 rounded-full border border-[#5a2a27] bg-[#5a2a27]/10 flex items-center justify-center text-sm font-serif uppercase">{user.name[0]}</div>
+                <span className="text-xs font-serif italic truncate max-w-[100px]">{user.name}</span>
               </div>
               <button onClick={signOut} className="text-[#5a2a27] hover:text-[#8b0000]">
                 <LogOut size={18} />
               </button>
             </div>
           ) : (
-            <button
-              onClick={signIn}
-              className="w-full flex items-center justify-center space-x-2 btn-journal"
-            >
+            <div className="flex items-center space-x-3 opacity-50">
               <User size={18} />
-              <span>Begin Expedition</span>
-            </button>
+              <span className="text-xs font-serif italic">Not signed in</span>
+            </div>
           )}
         </div>
       </aside>
@@ -93,9 +89,9 @@ export default function JournalLayout({ children, activeTab, setActiveTab, onOpe
             <LogOut size={18} />
           </button>
         ) : (
-          <button onClick={signIn} className="text-[#5a2a27]">
+          <span className="text-[#5a2a27] opacity-50">
             <User size={18} />
-          </button>
+          </span>
         )}
       </header>
 

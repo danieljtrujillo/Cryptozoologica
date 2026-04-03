@@ -2,3 +2,8 @@
 name = "cryptozoologica"
 pages_build_output_dir = "./dist"
 compatibility_date = "2026-03-28"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "cryptid-journal"
+database_id = "71e5815d-a707-4306-a51d-693995a97adf"

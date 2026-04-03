@@ -11,6 +11,7 @@ import ResearchLab from './components/ResearchLab';
 import MyObservations from './components/MyObservations';
 import CryptidLive from './components/CryptidLive';
 import FundingGuard from './components/FundingGuard';
+import { AuthProvider } from './lib/auth';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('journal');
@@ -52,15 +53,17 @@ export default function App() {
   };
 
   return (
-    <FundingGuard>
-      <JournalLayout 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab}
-        onOpenArchive={() => setShowArchiveMenu(true)}
-      >
-        {renderContent()}
-      </JournalLayout>
-    </FundingGuard>
+    <AuthProvider>
+      <FundingGuard>
+        <JournalLayout 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab}
+          onOpenArchive={() => setShowArchiveMenu(true)}
+        >
+          {renderContent()}
+        </JournalLayout>
+      </FundingGuard>
+    </AuthProvider>
   );
 }
 

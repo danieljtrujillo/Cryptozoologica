@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Search, Volume2, Loader2, Book, Bookmark, Check, ChevronRight, UserX, X, Archive } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { searchCryptid, speakJournalEntry } from '../services/gemini';
-import { auth, db } from '../lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { useAuthState } from 'react-firebase-hooks/auth';
+import { useAuth } from '../lib/auth';
+import { apiPost } from '../lib/api';
 import { PREFILLED_CRYPTIDS, CryptidEntry } from '../constants/cryptids';
 import { cn } from '../lib/utils';
 import { CryptidLink } from './CryptidLink';
@@ -23,7 +22,7 @@ export default function FieldJournal({
   showArchiveMenu?: boolean;
   onCloseArchiveMenu?: () => void;
 }) {
-  const [user] = useAuthState(auth);
+  const { user } = useAuth();
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [entry, setEntry] = useState<{ text: string; imageUrl: string | null; isPrefilled?: boolean; researcher?: string; style?: string } | null>(null);
@@ -83,12 +82,10 @@ export default function FieldJournal({
   const handleSave = async () => {
     if (!user || !entry || isSaved) return;
     try {
-      await addDoc(collection(db, 'saved_entries'), {
-        userId: user.uid,
+      await apiPost('/api/saved-entries', {
         cryptidName: query,
         content: entry.text,
         imageUrl: entry.imageUrl,
-        timestamp: serverTimestamp(),
       });
       setIsSaved(true);
     } catch (err) {

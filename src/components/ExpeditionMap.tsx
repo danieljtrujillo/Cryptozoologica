@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { MapPin, Search, Loader2, ExternalLink, Bookmark, Check } from 'lucide-react';
 import { searchNearbyCryptids } from '../services/gemini';
 import ReactMarkdown from 'react-markdown';
-import { auth, db } from '../lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { useAuthState } from 'react-firebase-hooks/auth';
+import { useAuth } from '../lib/auth';
+import { apiPost } from '../lib/api';
 import { cn } from '../lib/utils';
 import { CryptidLink } from './CryptidLink';
 
 export default function ExpeditionMap({ onCryptidClick }: { onCryptidClick?: (name: string) => void }) {
-  const [user] = useAuthState(auth);
+  const { user } = useAuth();
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<{ text: string; sources: string[] } | null>(null);
@@ -51,13 +50,11 @@ export default function ExpeditionMap({ onCryptidClick }: { onCryptidClick?: (na
   const handleSaveLocation = async (name: string) => {
     if (!user || !location || savedLocations.has(name)) return;
     try {
-      await addDoc(collection(db, 'saved_locations'), {
-        userId: user.uid,
+      await apiPost('/api/saved-locations', {
         name: name,
         description: `Nearby sightings at ${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`,
         lat: location.lat,
         lng: location.lng,
-        timestamp: serverTimestamp(),
       });
       setSavedLocations(prev => new Set(prev).add(name));
     } catch (err) {
